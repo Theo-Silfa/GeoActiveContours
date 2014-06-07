@@ -37,3 +37,7 @@ INCLUDEPATH += image_processing/data_structures \
                image_processing/algorithms
 
 FORMS    += UI/forms/mainwindow.ui
+
+CONFIG(debug, debug|release) {
+    CONFIG += console
+}
