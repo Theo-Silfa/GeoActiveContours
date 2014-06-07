@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QDebug>
+#include <QGraphicsPixmapItem>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -14,13 +15,35 @@ MainWindow::MainWindow(QWidget *parent) :
 
     imageReader = new QImageReader();
 
+    graphicScene = new SmartQGraphicsScene(this);
+
+    graphicsView = new QGraphicsView(this);
+
+    graphicsView->setProperty("mouseTracking", true);
+    ui->horizontalLayout->addWidget(graphicsView);
+
     ac = nullptr;
+
+    item = nullptr;
+
+    connect(graphicScene, SIGNAL(sendMouseEventMessage(int,int)), this, SLOT(changeStatusBar(int,int)));
 }
 
 MainWindow::~MainWindow()
 {
+    delete graphicsView;
     delete imageReader;
+
+    if(item != nullptr)
+        delete item;
+
     delete ui;
+}
+
+void MainWindow::changeStatusBar(int x, int y)
+{
+    QString coordinates_string = QString("(%1 | %2)").arg(QString::number(x), QString::number(y));
+    ui->statusBar->showMessage(coordinates_string);
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -40,5 +63,15 @@ void MainWindow::on_actionOpen_triggered()
 
     qDebug()<<"Opened file: "<<filename;
     qDebug() << "Image size: " << originalImg.size();
+
+    item = new QGraphicsPixmapItem(QPixmap::fromImage(originalImg));
+
+    graphicScene->addItem(item);
+
+    graphicsView->setScene(graphicScene);
+
+    graphicsView->setSceneRect(originalImg.rect());
+
+    graphicsView->show();
 
 }

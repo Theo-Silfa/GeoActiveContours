@@ -4,7 +4,10 @@
 #include <QMainWindow>
 #include <QImageReader>
 #include <QImage>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
+#include "smartqgraphicsscene.h"
 #include "region_based_active_contour_yuv.hpp"
 
 namespace Ui {
@@ -21,14 +24,20 @@ public:
 
 private slots:
     void on_actionOpen_triggered();
+    void changeStatusBar(int x, int y);
 
 private:
     Ui::MainWindow *ui;
 
     ofeli::ActiveContour * ac;
 
+    QGraphicsView * graphicsView;
+
+    SmartQGraphicsScene * graphicScene;
+
     QImageReader * imageReader;
 
+    QGraphicsPixmapItem * item;
     QImage originalImg;
 
 };
