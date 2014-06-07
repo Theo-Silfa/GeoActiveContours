@@ -12,18 +12,17 @@ TARGET = ActiveContours
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    image_processing/algorithms/active_contour.cpp \
+SOURCES += image_processing/algorithms/active_contour.cpp \
     image_processing/algorithms/edge_based_active_contour.cpp \
     image_processing/algorithms/filters.cpp \
     image_processing/algorithms/hausdorff_distance.cpp \
     image_processing/algorithms/region_based_active_contour.cpp \
     image_processing/algorithms/region_based_active_contour_yuv.cpp \
-    image_processing/algorithms/tracking_active_contour.cpp
+    image_processing/algorithms/tracking_active_contour.cpp \
+    UI/src/main.cpp \
+    UI/src/mainwindow.cpp
 
-HEADERS  += mainwindow.h \
-    image_processing/algorithms/active_contour.hpp \
+HEADERS  += image_processing/algorithms/active_contour.hpp \
     image_processing/algorithms/edge_based_active_contour.hpp \
     image_processing/algorithms/filters.hpp \
     image_processing/algorithms/hausdorff_distance.hpp \
@@ -31,9 +30,10 @@ HEADERS  += mainwindow.h \
     image_processing/algorithms/region_based_active_contour_yuv.hpp \
     image_processing/algorithms/tracking_active_contour.hpp \
     image_processing/data_structures/list.hpp \
-    image_processing/data_structures/matrix.hpp
+    image_processing/data_structures/matrix.hpp \
+    UI/src/mainwindow.h
 
 INCLUDEPATH += image_processing/data_structures \
                image_processing/algorithms
 
-FORMS    += mainwindow.ui
+FORMS    += UI/forms/mainwindow.ui
