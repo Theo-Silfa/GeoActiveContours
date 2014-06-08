@@ -22,7 +22,8 @@ SOURCES += image_processing/algorithms/active_contour.cpp \
     UI/src/main.cpp \
     UI/src/mainwindow.cpp \
     UI/src/smartqgraphicsscene.cpp \
-    UI/src/smartqgraphicsview.cpp
+    UI/src/smartqgraphicsview.cpp \
+    UI/src/tooldialog.cpp
 
 HEADERS  += image_processing/algorithms/active_contour.hpp \
     image_processing/algorithms/edge_based_active_contour.hpp \
@@ -35,12 +36,14 @@ HEADERS  += image_processing/algorithms/active_contour.hpp \
     image_processing/data_structures/matrix.hpp \
     UI/src/mainwindow.h \
     UI/src/smartqgraphicsscene.h \
-    UI/src/smartqgraphicsview.h
+    UI/src/smartqgraphicsview.h \
+    UI/src/tooldialog.h
 
 INCLUDEPATH += image_processing/data_structures \
                image_processing/algorithms
 
-FORMS    += UI/forms/mainwindow.ui
+FORMS    += UI/forms/mainwindow.ui \
+    UI/forms/tooldialog.ui
 
 CONFIG(debug, debug|release) {
     CONFIG += console

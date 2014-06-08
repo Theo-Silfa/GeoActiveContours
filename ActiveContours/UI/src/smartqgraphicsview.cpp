@@ -11,6 +11,8 @@ SmartQGraphicsView::SmartQGraphicsView(QWidget *parent) :
     QGraphicsView(parent)
 {
     insideWidget = false;
+    paintImage = nullptr;
+    pixMapItem = nullptr;
 }
 
 SmartQGraphicsView::~SmartQGraphicsView()
@@ -51,4 +53,22 @@ bool SmartQGraphicsView::event(QEvent *event)
     }
 
     return QGraphicsView::event(event);
+}
+
+void SmartQGraphicsView::paintEvent(QPaintEvent *event)
+{
+    QGraphicsView::paintEvent(event);
+
+    if(pixMapItem != nullptr)
+        pixMapItem->setPixmap(QPixmap::fromImage(*paintImage));
+}
+
+void SmartQGraphicsView::setImagePaintPointer(QImage *paintImage)
+{
+    this->paintImage = paintImage;
+}
+
+void SmartQGraphicsView::setPixmapItemPointer(QGraphicsPixmapItem *pixMapItem)
+{
+    this->pixMapItem = pixMapItem;
 }
