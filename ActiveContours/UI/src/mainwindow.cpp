@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     graphicScene = new SmartQGraphicsScene(this);
 
-    graphicsView = new QGraphicsView(this);
+    graphicsView = new SmartQGraphicsView(this);
 
     graphicsView->setProperty("mouseTracking", true);
     ui->horizontalLayout->addWidget(graphicsView);
@@ -26,12 +26,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     item = nullptr;
 
-    connect(graphicScene, SIGNAL(sendMouseEventMessage(int,int)), this, SLOT(changeStatusBar(int,int)));
+    //connect(graphicScene, SIGNAL(sendMouseEventMessage(int,int)), this, SLOT(changeStatusBar(int,int)));
+    connect(graphicsView, SIGNAL(sendMouseEventMessage(int,int)), this, SLOT(changeStatusBar(int,int)));
 }
 
 MainWindow::~MainWindow()
 {
-    delete graphicsView;
     delete imageReader;
 
     if(item != nullptr)

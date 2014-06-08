@@ -21,7 +21,8 @@ SOURCES += image_processing/algorithms/active_contour.cpp \
     image_processing/algorithms/tracking_active_contour.cpp \
     UI/src/main.cpp \
     UI/src/mainwindow.cpp \
-    UI/src/smartqgraphicsscene.cpp
+    UI/src/smartqgraphicsscene.cpp \
+    UI/src/smartqgraphicsview.cpp
 
 HEADERS  += image_processing/algorithms/active_contour.hpp \
     image_processing/algorithms/edge_based_active_contour.hpp \
@@ -33,7 +34,8 @@ HEADERS  += image_processing/algorithms/active_contour.hpp \
     image_processing/data_structures/list.hpp \
     image_processing/data_structures/matrix.hpp \
     UI/src/mainwindow.h \
-    UI/src/smartqgraphicsscene.h
+    UI/src/smartqgraphicsscene.h \
+    UI/src/smartqgraphicsview.h
 
 INCLUDEPATH += image_processing/data_structures \
                image_processing/algorithms

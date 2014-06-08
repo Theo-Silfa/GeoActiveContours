@@ -8,6 +8,7 @@
 #include <QGraphicsScene>
 
 #include "smartqgraphicsscene.h"
+#include "smartqgraphicsview.h"
 #include "region_based_active_contour_yuv.hpp"
 
 namespace Ui {
@@ -31,7 +32,7 @@ private:
 
     ofeli::ActiveContour * ac;
 
-    QGraphicsView * graphicsView;
+    SmartQGraphicsView * graphicsView;
 
     SmartQGraphicsScene * graphicScene;
 
