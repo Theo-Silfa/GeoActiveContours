@@ -86,6 +86,7 @@ private:
 
     int img_width;
     int img_height;
+    int byte_per_pixel;
 
     unsigned char* img_data_result;
 

@@ -401,7 +401,9 @@ void MainWindow::on_actionOpen_triggered()
 
     graphicsView->show();
 
-    img_data_result = new unsigned char[(originalImg.format() - 1)*img_width*img_height];
+    byte_per_pixel = originalImg.format() - 1;
+
+    img_data_result = new unsigned char[byte_per_pixel*img_width*img_height];
 
     imageSet = true;
 }
@@ -416,9 +418,7 @@ void MainWindow::on_actionSave_triggered()
     QString filename = QFileDialog::getSaveFileName(this,
          tr("Save Image"), QDir::currentPath(), tr("Image Files (*.png *.jpg *.bmp *.tif)"));
 
-    pixmapPhi.save(filename, 0, 100);
-
-    //imageWriter->write(ImgPhi);
+    item->pixmap().save(filename,0,100);
 }
 
 void MainWindow::shapeChanged(int height, int width)
@@ -430,7 +430,6 @@ void MainWindow::shapeChanged(int height, int width)
 void MainWindow::startConverge()
 {
     int img_size = img_width*img_height;
-    int byte_per_pixel = originalImg.format() - 1;
     signed char * phi_matrix_array = new signed char[img_size];
     unsigned char* img_data = new unsigned char[byte_per_pixel*img_width*img_height];
 
@@ -494,7 +493,6 @@ void MainWindow::startConverge()
     QImage image_result = QImage(img_data_result, img_width, img_height, byte_per_pixel*img_width, QImage::Format_RGB888);
 
     item->setPixmap(QPixmap::fromImage(image_result));
-
 
     delete ac;
     delete phi_matrix_array;
