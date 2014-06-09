@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     painterPhi = nullptr;
 
+    img_data_result = nullptr;
+
     shapeHeight = 50;
     shapeWidth = 50;
 
@@ -58,6 +60,9 @@ MainWindow::~MainWindow()
         delete painterPhi;
 
     delete ui;
+
+    if(img_data_result != nullptr)
+        delete img_data_result;
 }
 
 void MainWindow::DrawPixel(int x, int y, QRgb color)
@@ -103,10 +108,10 @@ void MainWindow::DrawEllipse(int x0, int y0, int width, int height, QRgb color)
     }
 }
 
-void MainWindow::initPhiMatrix()
+void MainWindow::initPhiMatrix(signed char *phi_matrix_array)
 {
-    QImage testMatrix(originalImg.size(), QImage::Format_RGB16);
-    testMatrix.fill(Qt::green);
+    //QImage testMatrix(originalImg.size(), QImage::Format_RGB16);
+    //testMatrix.fill(Qt::green);
 
     QImage imgPhi = pixmapPhi.toImage();
     QRgb *rowData = nullptr;
@@ -176,7 +181,9 @@ void MainWindow::initPhiMatrix()
             result = identifyPixel(centerPixel, upPixel, downPixel, leftPixel, rightPixel,
                                    upLeftPixel, upRightPixel, downLeftPixel, downRightPixel);
 
-            if(result == 3)
+            phi_matrix_array[find_offset(x,y)] = result;
+
+            /*if(result == 3)
             {
                 testMatrix.setPixel(x,y,qRgb(0,0,255));
             }
@@ -194,7 +201,7 @@ void MainWindow::initPhiMatrix()
             if(result == -1)
             {
                 testMatrix.setPixel(x,y,qRgb(255,255,255));
-            }
+            }*/
         }
 
         upPixel = 0;
@@ -210,7 +217,24 @@ void MainWindow::initPhiMatrix()
         result = 0;
     }
 
-    testMatrix.save("D:/testMatrix.bmp", 0, 100);
+    //testMatrix.save("D:/testMatrix.bmp", 0, 100);
+}
+
+void MainWindow::initImgData(unsigned char *img_data)
+{
+    QRgb pix;
+
+    for( int y = 0; y < img_height; y++ )
+    {
+        for( int x = 0; x < img_width; x++ )
+        {
+            pix = originalImg.pixel(x,y);
+
+            img_data[ 3*find_offset(x,y) ] = (unsigned char)( qRed(pix) );
+            img_data[ 3*find_offset(x,y)+1 ] = (unsigned char)( qGreen(pix) );
+            img_data[ 3*find_offset(x,y)+2 ] = (unsigned char)( qBlue(pix) );
+        }
+    }
 }
 
 int MainWindow::identifyPixel(QRgb centerPixel, QRgb upPixel, QRgb downPixel, QRgb leftPixel, QRgb rightPixel,
@@ -223,17 +247,37 @@ int MainWindow::identifyPixel(QRgb centerPixel, QRgb upPixel, QRgb downPixel, QR
 
     if(centerPixel != 0) //pixel is white
     {
-        if(four_connection_strict == true && eight_connection_strict == true)
-            return -3;
+        if( HAS_8_CONNEXITY)
+        {
+            if(four_connection_strict == true && eight_connection_strict == true)
+                return -3;
+            else
+                return -1;
+        }
         else
-            return -1;
+        {
+            if(four_connection_strict == true)
+                return -3;
+            else
+                return -1;
+        }
     }
     else //pixel is black
     {
-        if(four_connection == false && eight_connection == false) //TODO: This helps! Need to investigate!
-            return 3;
+        if( HAS_8_CONNEXITY)
+        {
+            if(four_connection == false && eight_connection == false) //TODO: This helps! Need to investigate!
+                return 3;
+            else
+                return 1;
+        }
         else
-            return 1;
+        {
+            if(four_connection == false)
+                return 3;
+            else
+                return 1;
+        }
     }
 
     return 0;
@@ -339,6 +383,9 @@ void MainWindow::on_actionOpen_triggered()
 
     pixmapPhi.fill(Qt::black);
 
+    img_width = pixmapPhi.width();
+    img_height = pixmapPhi.height();
+
     painterPhi = new QPainter(&pixmapPhi);
     QBrush phiBrush(Qt::white, Qt::SolidPattern);
     painterPhi->setBrush(phiBrush);
@@ -353,6 +400,8 @@ void MainWindow::on_actionOpen_triggered()
     graphicsView->setSceneRect(originalImg.rect());
 
     graphicsView->show();
+
+    img_data_result = new unsigned char[(originalImg.format() - 1)*img_width*img_height];
 
     imageSet = true;
 }
@@ -380,5 +429,74 @@ void MainWindow::shapeChanged(int height, int width)
 
 void MainWindow::startConverge()
 {
-    initPhiMatrix();
+    int img_size = img_width*img_height;
+    int byte_per_pixel = originalImg.format() - 1;
+    signed char * phi_matrix_array = new signed char[img_size];
+    unsigned char* img_data = new unsigned char[byte_per_pixel*img_width*img_height];
+
+    bool smothing_cycle = true;
+    unsigned int gauss_kernel_size = 5;
+    double gauss_sigma = 2.00;
+
+    unsigned int Na = 30;
+    unsigned int Ns = 3;
+
+    unsigned int lamda_out = 1;
+    unsigned int lamda_in = 1;
+
+    unsigned int Y = 1;
+    unsigned int U = 10;
+    unsigned int V = 10;
+
+
+    initPhiMatrix(phi_matrix_array);
+    initImgData(img_data);
+
+    //std::memcpy(img_data_result, img_data, byte_per_pixel*img_width*img_height);
+
+    ofeli::Matrix<const signed char> phi_matrix(phi_matrix_array,img_width,img_height);
+    ofeli::Matrix<const unsigned char> img_matrix(img_data,img_width,img_height);
+
+
+    ac = new ofeli::RegionBasedActiveContourYUV(img_matrix,
+                                      phi_matrix,
+                                      smothing_cycle, gauss_kernel_size, gauss_sigma, Na, Ns,
+                                      lamda_out, lamda_in,
+                                      Y,U,V);
+
+    while( !ac->get_isStopped() )
+    {
+        ac->evolve_one_iteration();
+    }
+
+
+    unsigned int offset = 0;
+
+    for( auto it = ac->get_Lout().begin(); !it.end(); ++it )
+    {
+        offset = *it*3;
+
+        img_data_result[offset] = 0; //R
+        img_data_result[offset+1] = 0; //G
+        img_data_result[offset+2] = 255; //B
+
+    }
+
+    for( auto it = ac->get_Lin().begin(); !it.end(); ++it )
+    {
+        offset = *it*3;
+
+        img_data_result[offset] = 255; //R
+        img_data_result[offset+1] = 0; //G
+        img_data_result[offset+2] = 0; //B
+    }
+
+    QImage image_result = QImage(img_data_result, img_width, img_height, byte_per_pixel*img_width, QImage::Format_RGB888);
+
+    item->setPixmap(QPixmap::fromImage(image_result));
+
+
+    delete ac;
+    delete phi_matrix_array;
+    delete img_data;
 }

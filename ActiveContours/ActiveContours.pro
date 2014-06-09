@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ActiveContours
 TEMPLATE = app
 
+DEFINES += "HAS_8_CONNEXITY=false"
 
 SOURCES += image_processing/algorithms/active_contour.cpp \
     image_processing/algorithms/edge_based_active_contour.cpp \

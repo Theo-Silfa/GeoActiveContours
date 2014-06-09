@@ -14,6 +14,13 @@
 #include "region_based_active_contour_yuv.hpp"
 #include "tooldialog.h"
 
+//active_contours
+#include "matrix.hpp"
+
+#ifndef HAS_8_CONNEXITY
+#define HAS_8_CONNEXITY false
+#endif
+
 namespace Ui {
 class MainWindow;
 }
@@ -29,7 +36,10 @@ public:
 protected:
     void DrawPixel(int x, int y, QRgb color);
     void DrawEllipse(int x0, int y0, int width, int height, QRgb color);
-    void initPhiMatrix();
+    void initPhiMatrix(signed char *phi_matrix_array);
+    void initImgData(unsigned char* img_data);
+
+    unsigned int find_offset(unsigned int x, unsigned int y) const;
 
     int identifyPixel(QRgb centerPixel, QRgb upPixel, QRgb downPixel, QRgb leftPixel, QRgb rightPixel, QRgb upLeftPixel, QRgb upRightPixel, QRgb downLeftPixel, QRgb downRightPixel);
     bool fourConnection(QRgb upPixel, QRgb downPixel, QRgb leftPixel, QRgb rightPixel, bool strict);
@@ -74,6 +84,16 @@ private:
     int shapeHeight;
     int shapeWidth;
 
+    int img_width;
+    int img_height;
+
+    unsigned char* img_data_result;
+
 };
+
+inline unsigned int MainWindow::find_offset(unsigned int x, unsigned int y) const
+{
+    return x+y*img_width;
+}
 
 #endif // MAINWINDOW_H
