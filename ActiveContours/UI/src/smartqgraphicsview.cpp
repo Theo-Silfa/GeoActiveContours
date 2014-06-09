@@ -32,11 +32,29 @@ void SmartQGraphicsView::mouseMoveEvent ( QMouseEvent * mouseEvent )
 
             if(scenePoint.x() >= 0 && scenePoint.x() < graphicScene->width() && scenePoint.y() >= 0 && scenePoint.y() < graphicScene->height())
             {
-                emit sendMouseEventMessage(scenePoint.x(), scenePoint.y());
+                emit sendMouseMoveSignal(scenePoint.x(), scenePoint.y());
             }
             else
             {
-                emit sendMouseEventMessage(-1, -1);
+                emit sendMouseMoveSignal(-1, -1);
+            }
+        }
+    }
+}
+
+void SmartQGraphicsView::mousePressEvent(QMouseEvent *mouseEvent)
+{
+    QGraphicsScene * graphicScene = scene();
+
+    if(graphicScene != nullptr)
+    {
+        if(insideWidget)
+        {
+            QPointF scenePoint = mapToScene(mouseEvent->x(), mouseEvent->y());
+
+            if(scenePoint.x() >= 0 && scenePoint.x() < graphicScene->width() && scenePoint.y() >= 0 && scenePoint.y() < graphicScene->height())
+            {
+                emit sendMouseClickSignal(scenePoint.x(), scenePoint.y());
             }
         }
     }
@@ -49,7 +67,7 @@ bool SmartQGraphicsView::event(QEvent *event)
     if (event->type()==QEvent::Leave)
     {
         insideWidget = false;
-        emit sendMouseEventMessage(-1, -1);
+        emit sendMouseMoveSignal(-1, -1);
     }
 
     return QGraphicsView::event(event);
@@ -59,8 +77,6 @@ void SmartQGraphicsView::paintEvent(QPaintEvent *event)
 {
     QGraphicsView::paintEvent(event);
 
-    if(pixMapItem != nullptr)
-        pixMapItem->setPixmap(QPixmap::fromImage(*paintImage));
 }
 
 void SmartQGraphicsView::setImagePaintPointer(QImage *paintImage)

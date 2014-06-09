@@ -17,11 +17,13 @@ public:
 
 protected:
     void mouseMoveEvent ( QMouseEvent * mouseEvent );
+    void mousePressEvent ( QMouseEvent * mouseEvent );
     bool event ( QEvent * event );
     void paintEvent ( QPaintEvent * event );
 
 signals:
-    void sendMouseEventMessage(const int&, const int&);
+    void sendMouseMoveSignal(const int&, const int&);
+    void sendMouseClickSignal(const int&, const int&);
 
 public slots:
 
